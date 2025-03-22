@@ -1,83 +1,98 @@
-﻿using System;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 
 namespace ConsoleApp
 {
     public class BankAccount
     {
-        private decimal _balance;
-        private string _accountNumber;
-        private string _ownerName;
-
-        public BankAccount(decimal balance, string accountNumber)
+        #region constructors
+        public BankAccount()
         {
-            Balance = balance;
-            AccountNumber = accountNumber;
+            _id = Guid.NewGuid();
+            _accountNumber = _id.ToString()[..8];
+            _ownerName = "Unknown";
+            _balance = 0;
         }
 
-        public BankAccount(decimal balance, string accountNumber, string ownerName) : this(balance, accountNumber)
+        public BankAccount(string? ownerName) : this()
         {
             OwnerName = ownerName;
         }
+        #endregion
 
-        public decimal Balance
-        {
-            get => _balance;
-            private set
-            {
-                if (value > 0)
-                    _balance = value;
-            }
-        }
+        #region fields
+        private Guid? _id;
+        private string? _accountNumber;
+        private string? _ownerName;
+        private decimal? _balance;
+        #endregion
 
-        public string AccountNumber
-        {
-            get => _accountNumber;
-            private set
-            {
-                if (Regex.IsMatch(value, @"^\d{2}$"))
-                    _accountNumber = value;
-                else
-                    throw new Exception();
-            }
-        }
+        #region properties
+        #region prop
+        public Guid? Id => _id;
+        public string? AccountNumber => _accountNumber;
+        #endregion
 
-        public string OwnerName
+        #region propfull
+        public string? OwnerName
         {
             get => _ownerName;
             set
             {
                 if (Regex.IsMatch(value, @"^[A-Z][a-z]*$"))
+                {
                     _ownerName = value;
-                else
-                    throw new Exception();
+                    return;
+                }
+                throw new Exception("Invalid owner name");
             }
         }
 
-        public void Deposit(decimal amount)
+        public decimal? Balance
+        {
+            get => _balance;
+            private set
+            {
+                if (value > 0)
+                {
+                    _balance = value;
+                    return;
+                }
+                throw new Exception("Invalid balance");
+            }
+        }
+        #endregion
+        #endregion
+
+        #region methods
+        public void Deposit(decimal? amount)
         {
             if (amount > 0)
+            {
                 Balance += amount;
-            else
-                throw new Exception();
+                return;
+            }
+            throw new Exception("Invalid amount");
         }
 
-        public void Withdraw(decimal amount)
+        public void Withdraw(decimal? amount)
         {
             if (amount > 0 && Balance - amount >= 0)
+            {
                 Balance -= amount;
-            else
-                throw new Exception();
+                return;
+            }
+            throw new Exception("Invalid amount");
         }
 
-        public void DisplayAccountInfo()
+        public void DisplayAccount()
         {
             Console.WriteLine(this);
         }
 
         public override string ToString()
         {
-            return $"Account Number: {AccountNumber}\nOwner Name: {OwnerName}\nBalance: {Balance}";
+            return $"ID: {Id}\nAccount number: {AccountNumber}\nOwner name: {OwnerName}\nBalance: {Balance}";
         }
+        #endregion
     }
 }
