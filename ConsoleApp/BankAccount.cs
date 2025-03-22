@@ -17,13 +17,21 @@ namespace ConsoleApp
         {
             OwnerName = ownerName;
         }
+
+        public BankAccount(Guid? id, string? accountNumber, string? ownerName, decimal balance)
+        {
+            _id = id ?? Guid.NewGuid();
+            _accountNumber = accountNumber ?? _id.ToString()[..8];
+            OwnerName = ownerName;
+            Balance = balance;
+        }
         #endregion
 
         #region fields
         private Guid? _id;
         private string? _accountNumber;
         private string? _ownerName;
-        private decimal? _balance;
+        private decimal _balance;
         #endregion
 
         #region properties
@@ -38,21 +46,21 @@ namespace ConsoleApp
             get => _ownerName;
             set
             {
-                if (Regex.IsMatch(value, @"^[A-Z][a-z]*$"))
+                if (Regex.IsMatch(value, @"^[A-Za-z]+$"))
                 {
-                    _ownerName = value;
+                    _ownerName = char.ToUpper(value[0]) + value.Substring(1).ToLower();
                     return;
                 }
                 throw new Exception("Invalid owner name");
             }
         }
 
-        public decimal? Balance
+        public decimal Balance
         {
             get => _balance;
             private set
             {
-                if (value > 0)
+                if (value >= 0)
                 {
                     _balance = value;
                     return;
@@ -64,7 +72,7 @@ namespace ConsoleApp
         #endregion
 
         #region methods
-        public void Deposit(decimal? amount)
+        public void Deposit(decimal amount)
         {
             if (amount > 0)
             {
@@ -74,7 +82,7 @@ namespace ConsoleApp
             throw new Exception("Invalid amount");
         }
 
-        public void Withdraw(decimal? amount)
+        public void Withdraw(decimal amount)
         {
             if (amount > 0 && Balance - amount >= 0)
             {

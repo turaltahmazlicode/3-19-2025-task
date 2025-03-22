@@ -57,7 +57,6 @@
                 throw new Exception("Insufficient balance");
             sender.Withdraw(Amount.Value);
             receiver.Deposit(Amount.Value);
-            ExecutionDate = DateTime.Now;
         }
 
         public void DisplayTransaction()
@@ -67,6 +66,7 @@
 
         public override string ToString()
         {
+            Console.WriteLine(ExecutionDate is null);
             return $"Transaction ID: {TransactionId}\nSender ID: {SenderId}\nReceiver ID: {ReceiverId}\nAmount: {Amount}\nExecution date: {ExecutionDate}";
         }
         #endregion

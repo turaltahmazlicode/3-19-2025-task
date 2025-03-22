@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Principal;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using System.Transactions;
 
@@ -10,25 +11,40 @@ namespace ConsoleApp
 {
     class Menu
     {
+        private const string AdminFilePath = @"..\..\..\admin.json";
+        private const string BankFilePath = @"..\..\..\bank.json";
+
         public Menu()
         {
             choise = default;
-            Console.WriteLine("This is your admin account info: \n");
-            BankAccount admin = new("Tural");
-            Console.WriteLine(admin);
-            Console.WriteLine();
-            Pause();
-            Console.Clear();
-            Console.WriteLine("Welcome to the Bank!");
-            Console.WriteLine("Enter the name of the Bank: ");
-            Bank = new Bank(Console.ReadLine(), [admin]);
+
+            if (File.Exists(AdminFilePath))
+                admin = SerializationHelper.ReadFromFile<BankAccount>(AdminFilePath);
+            else
+            {
+                admin = new BankAccount("Tural");
+                SerializationHelper.WriteToFile(AdminFilePath, admin);
+            }
+
+            if (File.Exists(BankFilePath))
+            {
+                bank = SerializationHelper.ReadFromFile<Bank>(BankFilePath);
+                Console.WriteLine($"Welcome to the {bank.Name}!");
+                Pause();
+
+            }
+            else
+            {
+                Console.WriteLine("Welcome to the Bank!");
+                Console.Write("Enter the name of the Bank: ");
+                bank = new Bank(Console.ReadLine());
+            }
         }
 
-        public Bank Bank { get; private set; }
-
         char choise;
-
+        Bank bank;
         BankAccount? currentAccount;
+        BankAccount? admin;
 
         private static void Pause()
         {
@@ -53,6 +69,7 @@ namespace ConsoleApp
 
         public void Start()
         {
+            AppDomain.CurrentDomain.ProcessExit += (s, e) => SerializationHelper.WriteToFile(BankFilePath, bank);
             while (true)
             {
                 try
@@ -80,24 +97,27 @@ namespace ConsoleApp
             }
         }
 
+        #region login menu
         private void LoginMenu()
         {
             Console.WriteLine("Enter the account number to log in");
             string? acountNumber = Console.ReadLine();
-            currentAccount = Bank.GetAccountByAccountNumber(acountNumber);
-            if (acountNumber == Bank.BankAccounts?[0].AccountNumber)
+            currentAccount = bank.GetAccountByAccountNumber(acountNumber);
+            if (acountNumber == admin.AccountNumber)
             {
                 AdminMenu();
                 return;
             }
-            UserMenu();
+            if (currentAccount is not null)
+                UserMenu();
         }
 
+        #region admin menu
         private void AdminMenu()
         {
             while (true)
             {
-                choise = SetChoise("1. Add bank account\n2. Add bank transaction\n3. Delete account\n4. Display account\n5. Display bank\n0. Exit");
+                choise = SetChoise("1. Add bank account\n2. Delete account\n3. Display account\n4. Display bank\n0. Exit");
                 Console.Clear();
                 try
                 {
@@ -107,15 +127,13 @@ namespace ConsoleApp
                             AddAccount();
                             break;
                         case '2':
-                            AddTransaction();
+                            DeleteAccountMenu();
                             break;
                         case '3':
                             DisplayAccountMenu();
+                            Pause();
                             break;
                         case '4':
-                            DeleteAccountMenu();
-                            break;
-                        case '5':
                             DisplayBank();
                             Pause();
                             break;
@@ -137,20 +155,7 @@ namespace ConsoleApp
         {
             Console.Write("Enter the owner name: ");
             string? ownerName = Console.ReadLine();
-            Bank.AddAccount(new BankAccount(ownerName));
-        }
-
-        private void AddTransaction()
-        {
-            Console.Write("Enter the sender account id: ");
-            Guid? senderAccountNumber = Guid.Parse(Console.ReadLine());
-            Console.Write("Enter the receiver account id: ");
-            Guid? receiverAccountNumber = Guid.Parse(Console.ReadLine());
-            Console.Write("Enter the amount: ");
-            if (decimal.TryParse(Console.ReadLine(), out decimal amount))
-            {
-                Bank.ExecuteTransaction(new Transaction(senderAccountNumber, receiverAccountNumber, amount));
-            }
+            bank.AddAccount(new BankAccount(ownerName));
         }
 
         private void DeleteAccountMenu()
@@ -179,13 +184,13 @@ namespace ConsoleApp
         private void DeleteAccountById()
         {
             Console.Write("Enter the account id: ");
-            Bank.DeleteAccountById(Guid.Parse(Console.ReadLine()));
+            bank.DeleteAccountById(Guid.Parse(Console.ReadLine()));
         }
 
         private void DeleteAccountByAccountNumber()
         {
             Console.Write("Enter the account number: ");
-            Bank.DeleteAccountByAccountNumber(Console.ReadLine());
+            bank.DeleteAccountByAccountNumber(Console.ReadLine());
         }
         #endregion
 
@@ -218,28 +223,30 @@ namespace ConsoleApp
         private void DisplayAccountById()
         {
             Console.Write("Enter the account id: ");
-            Bank.GetAccountById(Guid.Parse(Console.ReadLine()));
+            bank.GetAccountById(Guid.Parse(Console.ReadLine()));
         }
 
         private void DisplayAccountByAccountNumber()
         {
             Console.Write("Enter the account number: ");
-            Bank.GetAccountByAccountNumber(Console.ReadLine());
+            bank.GetAccountByAccountNumber(Console.ReadLine());
         }
 
         private void DisplayAccountByOwnerName()
         {
             Console.Write("Enter the owner name: ");
-            Bank.GetAccountByOwnerName(Console.ReadLine());
+            bank.GetAccountByOwnerName(Console.ReadLine());
         }
         #endregion
 
         private void DisplayBank()
         {
-            Bank.DisplayBank();
+            bank.DisplayBank();
         }
+        #endregion 
         #endregion
 
+        #region user menu
         private void UserMenu()
         {
             while (true)
@@ -258,6 +265,7 @@ namespace ConsoleApp
                             break;
                         case '3':
                             DisplayAccount();
+                            Pause();
                             break;
                         case '4':
                             ChangeOwnerName();
@@ -277,6 +285,7 @@ namespace ConsoleApp
                 }
             }
         }
+
         #region user menu methods
         private void Deposit()
         {
@@ -306,15 +315,18 @@ namespace ConsoleApp
         {
             Console.Write("Enter the receiver account ID: ");
             Guid? receiverId = Guid.Parse(Console.ReadLine());
-            BankAccount? receiver = Bank.GetAccountById(receiverId);
+            BankAccount? receiver = bank.GetAccountById(receiverId);
 
             Console.Write("Enter the amount to transfer: ");
             Transaction transaction = new(currentAccount?.Id, receiverId, decimal.Parse(Console.ReadLine()));
 
             transaction.Execute(currentAccount, receiver);
 
-            Bank.AddTransaction(transaction);
+            bank.AddTransaction(transaction);
         }
+
+        #endregion
+        #endregion
         #endregion
     }
 }

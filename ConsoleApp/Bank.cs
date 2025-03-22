@@ -2,7 +2,7 @@
 
 namespace ConsoleApp
 {
-    class Bank
+    public class Bank
     {
         #region constructors
         public Bank()
@@ -16,6 +16,14 @@ namespace ConsoleApp
         public Bank(string? name) : this() => Name = name;
 
         public Bank(string? name, BankAccount[]? bankAccounts) : this(name) => _bankAccounts = bankAccounts ?? [];
+
+        public Bank(Guid? id, string? name, BankAccount[]? bankAccounts, Transaction[]? transactions)
+        {
+            _id = id ?? Guid.NewGuid();
+            Name = name;
+            _bankAccounts = bankAccounts ?? [];
+            _transactions = transactions ?? [];
+        }
         #endregion
 
         #region fields
@@ -126,7 +134,7 @@ namespace ConsoleApp
                 foreach (var transaction in Transactions)
                     sb.AppendLine(transaction.ToString());
             }
-            return sb.ToString();
+            return sb.ToString().Trim();
         }
         #endregion
     }
