@@ -52,6 +52,10 @@
                 throw new Exception("Amount must be greater than zero.");
             }
         }
+        #endregion
+        #endregion
+
+        #region methods
         public void Execute(BankAccount? sender, BankAccount? receiver)
         {
             if (ExecutionDate is not null)
