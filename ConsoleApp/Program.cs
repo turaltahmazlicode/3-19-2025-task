@@ -7,7 +7,7 @@
             try
             {
                 Menu menu = new();
-                menu.Start();
+                menu.StartMenu();
             }
             catch (Exception e)
             {

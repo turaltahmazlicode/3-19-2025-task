@@ -1,13 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Principal;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
-using System.Transactions;
-
-namespace ConsoleApp
+﻿namespace ConsoleApp
 {
     class Menu
     {
@@ -16,6 +7,7 @@ namespace ConsoleApp
 
         public Menu()
         {
+            Console.ForegroundColor = ConsoleColor.White;
             choise = default;
 
             if (File.Exists(AdminFilePath))
@@ -29,7 +21,9 @@ namespace ConsoleApp
             if (File.Exists(BankFilePath))
             {
                 bank = SerializationHelper.ReadFromFile<Bank>(BankFilePath);
-                Console.WriteLine($"Welcome to the {bank.Name}!");
+                Console.Write("Welcome to the ");
+                SetConsoleColor(ConsoleColor.Blue, () => Console.Write(bank.Name));
+                Console.WriteLine("!");
                 Pause();
             }
             else
@@ -45,6 +39,7 @@ namespace ConsoleApp
         BankAccount? currentAccount;
         BankAccount? admin;
 
+        #region static methods
         private static void Pause()
         {
             Console.Write("Press any key to continue...");
@@ -54,19 +49,28 @@ namespace ConsoleApp
         private static char SetChoise(string? info)
         {
             Console.Clear();
-            Console.WriteLine(info);
+            SetConsoleColor(ConsoleColor.White, () => Console.WriteLine(info));
+            SetConsoleColor(ConsoleColor.Yellow, () => Console.Write("Your choice: "));
             return Console.ReadKey().KeyChar;
         }
 
         private static void DisplayExceptionMsg(string? text)
         {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine(text);
-            Console.ForegroundColor = ConsoleColor.Gray;
-            Pause();
+            SetConsoleColor(ConsoleColor.Red, () => Console.WriteLine(text));
+            SetConsoleColor(ConsoleColor.Green, Pause);
         }
 
-        public void Start()
+        private static void SetConsoleColor(ConsoleColor color, Action action)
+        {
+            var originalColor = Console.ForegroundColor;
+            Console.ForegroundColor = color;
+            action();
+            Console.ForegroundColor = originalColor;
+        }
+        #endregion
+
+        #region menu
+        public void StartMenu()
         {
             AppDomain.CurrentDomain.ProcessExit += (s, e) => SerializationHelper.WriteToFile(BankFilePath, bank);
             while (true)
@@ -99,7 +103,7 @@ namespace ConsoleApp
         #region login menu
         private void LoginMenu()
         {
-            Console.WriteLine("Enter the account number to log in");
+            SetConsoleColor(ConsoleColor.White, () => Console.Write("Enter the account number to log in: "));
             string? acountNumber = Console.ReadLine();
             currentAccount = bank.GetAccountByAccountNumber(acountNumber);
             if (acountNumber == admin.AccountNumber)
@@ -108,7 +112,7 @@ namespace ConsoleApp
                 return;
             }
             if (currentAccount is null)
-                throw new Exception("Account not found");
+                throw new Exception("Account could not be found.");
             UserMenu();
         }
 
@@ -151,7 +155,7 @@ namespace ConsoleApp
         #region admin panel menu methods
         private void AddAccount()
         {
-            Console.Write("Enter the owner name: ");
+            SetConsoleColor(ConsoleColor.White, () => Console.Write("Enter the owner name: "));
             string? ownerName = Console.ReadLine();
             bank.AddAccount(new BankAccount(ownerName));
         }
@@ -184,19 +188,19 @@ namespace ConsoleApp
         #region delete account menu methods
         private void DeleteAccountById()
         {
-            Console.Write("Enter the account id: ");
+            SetConsoleColor(ConsoleColor.White, () => Console.Write("Enter the account id: "));
             bank.DeleteAccountById(Guid.Parse(Console.ReadLine()));
         }
 
         private void DeleteAccountByAccountNumber()
         {
-            Console.Write("Enter the account number: ");
+            SetConsoleColor(ConsoleColor.White, () => Console.Write("Enter the account number: "));
             bank.DeleteAccountByAccountNumber(Console.ReadLine());
         }
 
         private void DeleteAccountByOwnerName()
         {
-            Console.Write("Enter the owner name: ");
+            SetConsoleColor(ConsoleColor.White, () => Console.Write("Enter the owner name: "));
             bank.DeleteAccountByOwnerName(Console.ReadLine());
         }
         #endregion
@@ -224,35 +228,35 @@ namespace ConsoleApp
         #region display account menu methods
         private void DisplayAccount(string accInfo)
         {
-            Console.WriteLine(accInfo ?? throw new Exception("Account couldnt found"));
+            SetConsoleColor(ConsoleColor.Green, () => Console.WriteLine(accInfo ?? throw new Exception("Account couldn't be found")));
             Pause();
         }
 
         private void DisplayAccountById()
         {
-            Console.Write("Enter the account id: ");
+            SetConsoleColor(ConsoleColor.White, () => Console.Write("Enter the account id: "));
             DisplayAccount(bank.GetAccountById(Guid.Parse(Console.ReadLine())).ToString());
         }
 
         private void DisplayAccountByAccountNumber()
         {
-            Console.Write("Enter the account number: ");
+            SetConsoleColor(ConsoleColor.White, () => Console.Write("Enter the account number: "));
             DisplayAccount(bank.GetAccountByAccountNumber(Console.ReadLine()).ToString());
         }
 
         private void DisplayAccountByOwnerName()
         {
-            Console.Write("Enter the owner name: ");
+            SetConsoleColor(ConsoleColor.White, () => Console.Write("Enter the owner name: "));
             DisplayAccount(bank.GetAccountByOwnerName(Console.ReadLine()).ToString());
         }
         #endregion
 
         private void DisplayBank()
         {
-            bank.DisplayBank();
+            SetConsoleColor(ConsoleColor.Green, bank.DisplayBank);
             Pause();
         }
-        #endregion 
+        #endregion
         #endregion
 
         #region user menu
@@ -298,36 +302,36 @@ namespace ConsoleApp
         #region user menu methods
         private void Deposit()
         {
-            Console.Write("Enter the amount to deposit: ");
+            SetConsoleColor(ConsoleColor.White, () => Console.Write("Enter the amount to deposit: "));
             if (decimal.TryParse(Console.ReadLine(), out decimal amount))
                 currentAccount?.Deposit(amount);
         }
 
         private void Withdraw()
         {
-            Console.Write("Enter the amount to withdraw: ");
+            SetConsoleColor(ConsoleColor.White, () => Console.Write("Enter the amount to withdraw: "));
             if (decimal.TryParse(Console.ReadLine(), out decimal amount))
                 currentAccount?.Withdraw(amount);
         }
 
         private void DisplayAccount()
         {
-            currentAccount?.DisplayAccount();
+            SetConsoleColor(ConsoleColor.Green, currentAccount.DisplayAccount);
         }
 
         private void ChangeOwnerName()
         {
-            Console.WriteLine("Enter the new owner name: ");
+            SetConsoleColor(ConsoleColor.White, () => Console.Write("Enter the new owner name: "));
             currentAccount.OwnerName = Console.ReadLine();
         }
 
         private void Transfer()
         {
-            Console.Write("Enter the receiver account ID: ");
+            SetConsoleColor(ConsoleColor.White, () => Console.Write("Enter the receiver account ID: "));
             Guid? receiverId = Guid.Parse(Console.ReadLine());
             BankAccount? receiver = bank.GetAccountById(receiverId);
 
-            Console.Write("Enter the amount to transfer: ");
+            SetConsoleColor(ConsoleColor.White, () => Console.Write("Enter the amount to transfer: "));
             Transaction transaction = new(currentAccount?.Id, receiverId, decimal.Parse(Console.ReadLine()));
 
             transaction.Execute(currentAccount, receiver);
@@ -343,6 +347,7 @@ namespace ConsoleApp
         {
             AddAccount();
         }
+        #endregion 
         #endregion
     }
 }

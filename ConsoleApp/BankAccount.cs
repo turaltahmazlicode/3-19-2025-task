@@ -48,7 +48,7 @@ namespace ConsoleApp
             {
                 if (Regex.IsMatch(value, @"^[A-Za-z]+$"))
                 {
-                    _ownerName = char.ToUpper(value[0]) + value.Substring(1).ToLower();
+                    _ownerName = char.ToUpper(value[0]) + value[1..].ToLower();
                     return;
                 }
                 throw new Exception("Invalid owner name. The name must contain only alphabetic characters.");
