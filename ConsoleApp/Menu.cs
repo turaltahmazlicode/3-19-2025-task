@@ -135,7 +135,6 @@ namespace ConsoleApp
                             break;
                         case '4':
                             DisplayBank();
-                            Pause();
                             break;
                         case '0':
                             return;
@@ -216,6 +215,7 @@ namespace ConsoleApp
                     default:
                         break;
                 }
+                Pause();
             }
         }
 
@@ -223,25 +223,26 @@ namespace ConsoleApp
         private void DisplayAccountById()
         {
             Console.Write("Enter the account id: ");
-            bank.GetAccountById(Guid.Parse(Console.ReadLine()));
+            Console.WriteLine(bank.GetAccountById(Guid.Parse(Console.ReadLine())));
         }
 
         private void DisplayAccountByAccountNumber()
         {
             Console.Write("Enter the account number: ");
-            bank.GetAccountByAccountNumber(Console.ReadLine());
+            Console.WriteLine(bank.GetAccountByAccountNumber(Console.ReadLine()));
         }
 
         private void DisplayAccountByOwnerName()
         {
             Console.Write("Enter the owner name: ");
-            bank.GetAccountByOwnerName(Console.ReadLine());
+            Console.WriteLine(bank.GetAccountByOwnerName(Console.ReadLine()));
         }
         #endregion
 
         private void DisplayBank()
         {
             bank.DisplayBank();
+            Pause();
         }
         #endregion 
         #endregion
@@ -324,7 +325,6 @@ namespace ConsoleApp
 
             bank.AddTransaction(transaction);
         }
-
         #endregion
         #endregion
         #endregion
