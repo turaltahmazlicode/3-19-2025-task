@@ -62,7 +62,7 @@ namespace ConsoleApp
 
             for (int i = 0; i < BankAccounts.Length; i++)
                 if (BankAccounts[i].OwnerName == bankaccount.OwnerName)
-                    throw new Exception("Account with this owner name already exists");
+                    throw new Exception("Account with this owner name already exists.");
 
             Array.Resize(ref _bankAccounts, BankAccounts.Length + 1);
             BankAccounts[^1] = bankaccount;
@@ -74,7 +74,7 @@ namespace ConsoleApp
 
             for (int i = 0; i < Transactions.Length; i++)
                 if (Transactions[i].TransactionId == transaction.TransactionId)
-                    throw new Exception("Transaction with this ID already exists");
+                    throw new Exception("Transaction with this ID already exists.");
 
             Array.Resize(ref _transactions, Transactions.Length + 1);
             Transactions[^1] = transaction;
@@ -107,7 +107,7 @@ namespace ConsoleApp
                     Array.Resize(ref _bankAccounts, BankAccounts.Length - 1);
                     return;
                 }
-            throw new Exception("Account with the specified criteria was not found");
+            throw new Exception("Account with the specified criteria was not found.");
         }
 
         public void DeleteAccountById(Guid? id) => DeleteAccountBy(account => account?.Id == id);

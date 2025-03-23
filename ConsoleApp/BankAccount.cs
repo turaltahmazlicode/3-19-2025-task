@@ -51,7 +51,7 @@ namespace ConsoleApp
                     _ownerName = char.ToUpper(value[0]) + value.Substring(1).ToLower();
                     return;
                 }
-                throw new Exception("Invalid owner name");
+                throw new Exception("Invalid owner name. The name must contain only alphabetic characters.");
             }
         }
 
@@ -65,7 +65,7 @@ namespace ConsoleApp
                     _balance = value;
                     return;
                 }
-                throw new Exception("Invalid balance");
+                throw new Exception("Invalid balance. Balance cannot be negative.");
             }
         }
         #endregion
@@ -79,7 +79,7 @@ namespace ConsoleApp
                 Balance += amount;
                 return;
             }
-            throw new Exception("Invalid amount");
+            throw new Exception("Invalid amount. Amount must be greater than zero.");
         }
 
         public void Withdraw(decimal amount)
@@ -89,7 +89,7 @@ namespace ConsoleApp
                 Balance -= amount;
                 return;
             }
-            throw new Exception("Invalid amount");
+            throw new Exception("Invalid amount. The amount must be greater than zero and not exceed the current balance.");
         }
 
         public void DisplayAccount()
