@@ -95,17 +95,25 @@ namespace ConsoleApp
         public BankAccount? GetAccountByAccountNumber(string? accountNumber) => GetAccountBy(account => account?.AccountNumber == accountNumber);
 
         public BankAccount? GetAccountByOwnerName(string? ownerName) => GetAccountBy(account => account?.OwnerName == ownerName);
+
         private void DeleteAccountBy(Func<BankAccount?, bool>? predicate)
         {
-            if (BankAccounts is null || predicate is null)
-                return;
-            for (int i = 0; i < BankAccounts.Length; i++)
-                if (predicate(BankAccounts[i]))
-                {
-                    BankAccounts[i] = BankAccounts[^1];
-                    Array.Resize(ref _bankAccounts, BankAccounts.Length - 1);
+            try
+            {
+                if (BankAccounts is null || predicate is null)
                     return;
-                }
+                for (int i = 0; i < BankAccounts.Length; i++)
+                    if (predicate(BankAccounts[i]))
+                    {
+                        BankAccounts[i] = BankAccounts[^1];
+                        Array.Resize(ref _bankAccounts, BankAccounts.Length - 1);
+                        return;
+                    }
+            }
+            catch (Exception)
+            {
+                throw new Exception("Account with the specified criteria was not found.");
+            }
             throw new Exception("Account with the specified criteria was not found.");
         }
 

@@ -107,8 +107,9 @@ namespace ConsoleApp
                 AdminMenu();
                 return;
             }
-            if (currentAccount is not null)
-                UserMenu();
+            if (currentAccount is null)
+                throw new Exception("Account not found");
+            UserMenu();
         }
 
         #region admin menu
@@ -218,26 +219,31 @@ namespace ConsoleApp
                 default:
                     break;
             }
-            Pause();
         }
 
         #region display account menu methods
+        private void DisplayAccount(string accInfo)
+        {
+            Console.WriteLine(accInfo ?? throw new Exception("Account couldnt found"));
+            Pause();
+        }
+
         private void DisplayAccountById()
         {
             Console.Write("Enter the account id: ");
-            Console.WriteLine(bank.GetAccountById(Guid.Parse(Console.ReadLine())));
+            DisplayAccount(bank.GetAccountById(Guid.Parse(Console.ReadLine())).ToString());
         }
 
         private void DisplayAccountByAccountNumber()
         {
             Console.Write("Enter the account number: ");
-            Console.WriteLine(bank.GetAccountByAccountNumber(Console.ReadLine()));
+            DisplayAccount(bank.GetAccountByAccountNumber(Console.ReadLine()).ToString());
         }
 
         private void DisplayAccountByOwnerName()
         {
             Console.Write("Enter the owner name: ");
-            Console.WriteLine(bank.GetAccountByOwnerName(Console.ReadLine()));
+            DisplayAccount(bank.GetAccountByOwnerName(Console.ReadLine()).ToString());
         }
         #endregion
 
@@ -311,6 +317,7 @@ namespace ConsoleApp
 
         private void ChangeOwnerName()
         {
+            Console.WriteLine("Enter the new owner name: ");
             currentAccount.OwnerName = Console.ReadLine();
         }
 
