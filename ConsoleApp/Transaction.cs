@@ -49,21 +49,17 @@
                     _amount = value;
                     return;
                 }
-                throw new Exception("Invalid amount");
+                throw new Exception("Amount must be greater than zero.");
             }
         }
-        #endregion
-        #endregion
-
-        #region methods
         public void Execute(BankAccount? sender, BankAccount? receiver)
         {
             if (ExecutionDate is not null)
-                throw new Exception("Transaction is already executed");
+                throw new Exception("Transaction has already been executed.");
             if (sender is null || receiver is null)
-                throw new Exception("Invalid account id");
+                throw new Exception("Invalid account ID: receiver account couldn't be found in bank.");
             if (sender.Balance < Amount)
-                throw new Exception("Insufficient balance");
+                throw new Exception("Insufficient balance in sender's account.");
             sender.Withdraw(Amount);
             receiver.Deposit(Amount);
             ExecutionDate = DateTime.Now;
