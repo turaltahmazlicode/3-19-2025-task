@@ -95,7 +95,6 @@ namespace ConsoleApp
         public BankAccount? GetAccountByAccountNumber(string? accountNumber) => GetAccountBy(account => account?.AccountNumber == accountNumber);
 
         public BankAccount? GetAccountByOwnerName(string? ownerName) => GetAccountBy(account => account?.OwnerName == ownerName);
-
         private void DeleteAccountBy(Func<BankAccount?, bool>? predicate)
         {
             if (BankAccounts is null || predicate is null)
@@ -113,6 +112,8 @@ namespace ConsoleApp
         public void DeleteAccountById(Guid? id) => DeleteAccountBy(account => account?.Id == id);
 
         public void DeleteAccountByAccountNumber(string? accountNumber) => DeleteAccountBy(account => account?.AccountNumber == accountNumber);
+
+        public void DeleteAccountByOwnerName(string? ownerName) => DeleteAccountBy(account => account?.OwnerName == ownerName);
 
         public void ExecuteTransaction(Transaction? transaction)
         {

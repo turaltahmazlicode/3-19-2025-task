@@ -31,7 +31,6 @@ namespace ConsoleApp
                 bank = SerializationHelper.ReadFromFile<Bank>(BankFilePath);
                 Console.WriteLine($"Welcome to the {bank.Name}!");
                 Pause();
-
             }
             else
             {
@@ -82,7 +81,7 @@ namespace ConsoleApp
                             LoginMenu();
                             break;
                         case '2':
-                            //RegisterMenu();
+                            RegisterMenu();
                             break;
                         case '0':
                             return;
@@ -131,7 +130,6 @@ namespace ConsoleApp
                             break;
                         case '3':
                             DisplayAccountMenu();
-                            Pause();
                             break;
                         case '4':
                             DisplayBank();
@@ -161,7 +159,7 @@ namespace ConsoleApp
         {
             while (true)
             {
-                choise = SetChoise("1. Delete by account ID\n2. Delete by account number\n0. Exit");
+                choise = SetChoise("1. Delete by account ID\n2. Delete by account number\n3. Delete by owner name\n0. Exit");
                 Console.Clear();
                 switch (choise)
                 {
@@ -170,6 +168,9 @@ namespace ConsoleApp
                         return;
                     case '2':
                         DeleteAccountByAccountNumber();
+                        return;
+                    case '3':
+                        DeleteAccountByOwnerName();
                         return;
                     case '0':
                         return;
@@ -191,32 +192,33 @@ namespace ConsoleApp
             Console.Write("Enter the account number: ");
             bank.DeleteAccountByAccountNumber(Console.ReadLine());
         }
+
+        private void DeleteAccountByOwnerName()
+        {
+            Console.Write("Enter the owner name: ");
+            bank.DeleteAccountByOwnerName(Console.ReadLine());
+        }
         #endregion
 
         private void DisplayAccountMenu()
         {
-            while (true)
+            choise = SetChoise("1. Display by account ID\n2. Display by account number\n3. Display account by owner name\n0. Exit");
+            Console.Clear();
+            switch (choise)
             {
-                choise = SetChoise("1. Display by account ID\n2. Display by account number\n3. Display account by owner name\n0. Exit");
-                Console.Clear();
-                switch (choise)
-                {
-                    case '1':
-                        DisplayAccountById();
-                        return;
-                    case '2':
-                        DisplayAccountByAccountNumber();
-                        return;
-                    case '3':
-                        DisplayAccountByOwnerName();
-                        return;
-                    case '0':
-                        return;
-                    default:
-                        break;
-                }
-                Pause();
+                case '1':
+                    DisplayAccountById();
+                    break;
+                case '2':
+                    DisplayAccountByAccountNumber();
+                    break;
+                case '3':
+                    DisplayAccountByOwnerName();
+                    break;
+                default:
+                    break;
             }
+            Pause();
         }
 
         #region display account menu methods
@@ -327,6 +329,13 @@ namespace ConsoleApp
         }
         #endregion
         #endregion
+        #endregion
+
+        #region register menu
+        private void RegisterMenu()
+        {
+            AddAccount();
+        }
         #endregion
     }
 }
