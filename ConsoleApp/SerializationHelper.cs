@@ -26,7 +26,7 @@ namespace ConsoleApp
             {
                 PropertyNameCaseInsensitive = true,
                 WriteIndented = true,
-                Converters = { new BankAccountConverter(), new BankConverter() }
+                Converters = { new BankAccountConverter(), new BankConverter(), new TransactionConverter() }
             };
         }
     }
@@ -81,6 +81,34 @@ namespace ConsoleApp
             JsonSerializer.Serialize(writer, value.BankAccounts, options);
             writer.WritePropertyName("Transactions");
             JsonSerializer.Serialize(writer, value.Transactions, options);
+            writer.WriteEndObject();
+        }
+    }
+
+    public class TransactionConverter : System.Text.Json.Serialization.JsonConverter<Transaction>
+    {
+        public override Transaction Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            using (JsonDocument doc = JsonDocument.ParseValue(ref reader))
+            {
+                var root = doc.RootElement;
+                var transactionId = root.GetProperty("TransactionId").GetGuid();
+                var senderId = root.GetProperty("SenderId").GetGuid();
+                var receiverId = root.GetProperty("ReceiverId").GetGuid();
+                var amount = root.GetProperty("Amount").GetDecimal();
+                var executionDate = root.GetProperty("ExecutionDate").GetDateTime();
+                return new Transaction(transactionId, senderId, receiverId, amount, executionDate);
+            }
+        }
+
+        public override void Write(Utf8JsonWriter writer, Transaction value, JsonSerializerOptions options)
+        {
+            writer.WriteStartObject();
+            writer.WriteString("TransactionId", value.TransactionId.ToString());
+            writer.WriteString("SenderId", value.SenderId.ToString());
+            writer.WriteString("ReceiverId", value.ReceiverId.ToString());
+            writer.WriteNumber("Amount", value.Amount);
+            writer.WriteString("ExecutionDate", value.ExecutionDate.Value);
             writer.WriteEndObject();
         }
     }

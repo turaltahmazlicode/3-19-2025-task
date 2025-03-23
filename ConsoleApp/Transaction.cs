@@ -9,16 +9,25 @@
             ExecutionDate = null;
         }
 
-        public Transaction(Guid? senderId, Guid? receiverId, decimal? amount) : this()
+        public Transaction(Guid? senderId, Guid? receiverId, decimal amount) : this()
         {
             SenderId = senderId;
             ReceiverId = receiverId;
             Amount = amount;
         }
+
+        public Transaction(Guid? transactionId, Guid? senderId, Guid? receiverId, decimal amount, DateTime? executionDate)
+        {
+            TransactionId = transactionId;
+            SenderId = senderId;
+            ReceiverId = receiverId;
+            Amount = amount;
+            ExecutionDate = executionDate;
+        }
         #endregion
 
         #region fields
-        decimal? _amount;
+        decimal _amount;
         #endregion
 
         #region properties
@@ -30,7 +39,7 @@
         #endregion
 
         #region propfull
-        public decimal? Amount
+        public decimal Amount
         {
             get => _amount;
             set
@@ -55,8 +64,9 @@
                 throw new Exception("Invalid account id");
             if (sender.Balance < Amount)
                 throw new Exception("Insufficient balance");
-            sender.Withdraw(Amount.Value);
-            receiver.Deposit(Amount.Value);
+            sender.Withdraw(Amount);
+            receiver.Deposit(Amount);
+            ExecutionDate = DateTime.Now;
         }
 
         public void DisplayTransaction()
@@ -66,7 +76,6 @@
 
         public override string ToString()
         {
-            Console.WriteLine(ExecutionDate is null);
             return $"Transaction ID: {TransactionId}\nSender ID: {SenderId}\nReceiver ID: {ReceiverId}\nAmount: {Amount}\nExecution date: {ExecutionDate}";
         }
         #endregion
